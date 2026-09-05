@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SPEED — High Performance Karting</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Syne:ital,wght@0,700;0,800;1,800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        f1: {
+                            black: '#0A0B0E',
+                            card: 'rgba(18, 20, 29, 0.55)',
+                            red: '#FF1801',
+                            blue: '#00D2BE',
+                            border: 'rgba(255, 255, 255, 0.12)'
+                        }
+                    },
+                    fontFamily: {
+                        racing: ['Syne', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base Optimization for Smooth Motion */
+        html, body {
+            background-color: #0A0B0E;
+            color: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            width: 100%;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Glassmorphism Styling - Performance Optimized */
+        .glass-panel {
+            background: rgba(18, 20, 29, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+            will-change: transform;
+        }
+
+        /* Hover interactions only enabled on desktop (hover-capable devices) */
+        @media (hover: hover) and (pointer: fine) {
+            .glass-panel-hover:hover {
+                transform: translateY(-4px);
+                border-color: rgba(255, 255, 255, 0.25);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+            }
+            .glass-panel-active:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 0 50px rgba(255, 24, 1, 0.35);
+            }
+            .glass-button-red:hover {
+                box-shadow: 0 0 35px rgba(255, 24, 1, 0.7);
+                transform: translateY(-2px);
+            }
+            .glass-button-blue:hover {
+                background: rgba(0, 210, 190, 0.25);
+                box-shadow: 0 0 25px rgba(0, 210, 190, 0.4);
+                transform: translateY(-2px);
+            }
+            .kart-card:hover .kart-img {
+                transform: scale(1.06);
+            }
+        }
+
+        .glass-panel-active {
+            background: rgba(255, 24, 1, 0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 24, 1, 0.4);
+            box-shadow: 0 0 30px rgba(255, 24, 1, 0.15);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+            will-change: transform;
+        }
+
+        .glass-button-red {
+            background: linear-gradient(135deg, rgba(255, 24, 1, 0.85), rgba(180, 10, 0, 0.95));
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 100, 100, 0.3);
+            box-shadow: 0 0 20px rgba(255, 24, 1, 0.3);
+            transition: all 0.25s ease;
+        }
+
+        .glass-button-blue {
+            background: rgba(0, 210, 190, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 210, 190, 0.3);
+            transition: all 0.25s ease;
+        }
+
+        .f1-grid {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+
+        .kart-img {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Custom Mobile Scrollbar Hide for horizontal carousel */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="f1-grid antialiased selection:bg-f1-red selection:text-white">
+
+    <div class="fixed top-[-5%] left-[-10%] w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-f1-red/15 rounded-full blur-[80px] sm:blur-[140px] pointer-events-none"></div>
+    <div class="fixed bottom-[-5%] right-[-10%] w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-f1-blue/10 rounded-full blur-[80px] sm:blur-[140px] pointer-events-none"></div>
+
+    <nav class="fixed top-4 sm:top-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-6xl glass-panel rounded-full px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <span class="font-racing italic font-extrabold text-xl sm:text-2xl tracking-wider text-white">SPEED<span class="text-f1-red">.</span></span>
+        </div>
+        
+        <div class="hidden md:flex gap-8 text-xs sm:text-sm uppercase tracking-widest text-gray-300 font-semibold">
+            <a href="#track" class="hover:text-f1-blue transition-colors">Circuit</a>
+            <a href="#karts" class="hover:text-f1-blue transition-colors">Fleet</a>
+            <a href="#pricing" class="hover:text-f1-blue transition-colors">Pricing</a>
+            <a href="#testimonials" class="hover:text-f1-blue transition-colors">Reviews</a>
+        </div>
+        
+        <div class="flex items-center gap-3">
+            <a href="#pricing" class="glass-button-red px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-white">
+                Book Heat
+            </a>
+            <button id="menu-btn" class="md:hidden text-white p-1.5 focus:outline-none" aria-label="Toggle Menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <div id="mobile-menu" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-40 hidden flex-col justify-center items-center gap-8 text-lg uppercase tracking-widest font-racing italic font-bold transition-all duration-300">
+        <a href="#track" class="mobile-nav-link text-white hover:text-f1-blue">Circuit</a>
+        <a href="#karts" class="mobile-nav-link text-white hover:text-f1-blue">Fleet</a>
+        <a href="#pricing" class="mobile-nav-link text-white hover:text-f1-blue">Pricing</a>
+        <a href="#testimonials" class="mobile-nav-link text-white hover:text-f1-blue">Reviews</a>
+    </div>
+
+    <section class="min-h-screen flex flex-col justify-center items-center px-4 sm:px-6 pt-28 sm:pt-24 text-center relative">
+        <div class="hero-anim opacity-0 translate-y-6 inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full glass-panel text-f1-blue text-[10px] sm:text-xs font-mono uppercase tracking-widest mb-6">
+            <span class="w-2 h-2 rounded-full bg-f1-blue animate-pulse"></span> Track Conditions: Dry / Apex Open
+        </div>
+        
+        <h1 class="hero-anim opacity-0 translate-y-6 font-racing italic font-extrabold text-5xl sm:text-7xl md:text-9xl tracking-tight leading-none mb-6">
+            PURE <span class="text-transparent bg-clip-text bg-gradient-to-r from-f1-red via-white to-f1-blue">VELOCITY</span>
+        </h1>
+        
+        <p class="hero-anim opacity-0 translate-y-6 max-w-xl text-gray-400 text-sm sm:text-base md:text-lg mb-8 sm:mb-10 font-light px-2">
+            Engineered for adrenaline. Experience pro-level electric karting on a 1.2km precision asphalt circuit designed by racing engineers.
+        </p>
+
+        <div class="hero-anim opacity-0 translate-y-6 flex flex-col sm:flex-row gap-3 sm:gap-4 w-full justify-center max-w-xs sm:max-w-md">
+            <a href="#pricing" class="glass-button-red px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-racing italic font-bold uppercase tracking-wider text-white text-center text-xs sm:text-sm">
+                Reserve Session
+            </a>
+            <a href="#track" class="glass-button-blue px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-racing italic font-bold uppercase tracking-wider text-white text-center text-xs sm:text-sm">
+                Explore Circuit
+            </a>
+        </div>
+    </section>
+
+    <section id="track" class="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
+        <div class="text-center mb-8 sm:mb-12">
+            <span class="text-f1-blue font-mono text-[10px] sm:text-xs uppercase tracking-widest">// CIRCUIT ARCHITECTURE</span>
+            <h2 class="font-racing italic text-3xl sm:text-5xl font-extrabold mt-1 sm:mt-2">MODEL TRACK LAYOUT</h2>
+        </div>
+
+        <div class="glass-panel glass-panel-hover rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-12 relative overflow-hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 items-center">
+                
+                <div class="lg:col-span-2 relative flex justify-center items-center p-3 sm:p-6 border border-white/10 rounded-xl sm:rounded-2xl bg-black/40">
+                    <svg viewBox="0 0 800 400" class="w-full h-auto drop-shadow-[0_0_15px_rgba(0,210,190,0.25)]">
+                        <path d="M 100 200 C 100 100, 250 80, 400 80 C 550 80, 700 100, 700 200 C 700 300, 550 320, 450 320 C 350 320, 320 220, 220 220 C 150 220, 100 300, 100 200 Z" 
+                              fill="none" stroke="#12141D" stroke-width="32" stroke-linejoin="round"/>
+                        <path d="M 100 200 C 100 100, 250 80, 400 80 C 550 80, 700 100, 700 200 C 700 300, 550 320, 450 320 C 350 320, 320 220, 220 220 C 150 220, 100 300, 100 200 Z" 
+                              fill="none" stroke="#00D2BE" stroke-width="5" stroke-linejoin="round" class="animate-pulse"/>
+                        
+                        <circle cx="250" cy="85" r="7" fill="#FF1801" />
+                        <text x="250" y="65" fill="#FFFFFF" font-size="12" font-family="Syne" font-weight="bold" text-anchor="middle">S1: MONZA HAIRPIN</text>
+
+                        <circle cx="700" cy="200" r="7" fill="#FF1801" />
+                        <text x="700" y="235" fill="#FFFFFF" font-size="12" font-family="Syne" font-weight="bold" text-anchor="middle">S2: THE SWEEPER</text>
+
+                        <circle cx="220" cy="220" r="7" fill="#FF1801" />
+                        <text x="220" y="200" fill="#FFFFFF" font-size="12" font-family="Syne" font-weight="bold" text-anchor="middle">S3: CHICANE</text>
+                    </svg>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-4 sm:gap-6">
+                    <div class="border-l-2 border-f1-red pl-3 sm:pl-4">
+                        <span class="text-[10px] sm:text-xs font-mono text-gray-400 uppercase">Total Distance</span>
+                        <div class="font-racing italic text-xl sm:text-3xl font-bold">1.25 KILOMETERS</div>
+                    </div>
+
+                    <div class="border-l-2 border-f1-blue pl-3 sm:pl-4">
+                        <span class="text-[10px] sm:text-xs font-mono text-gray-400 uppercase">Track Record</span>
+                        <div class="font-racing italic text-xl sm:text-3xl font-bold text-f1-blue">48.204s</div>
+                        <span class="text-[10px] text-gray-500">Set by Alex V. (PRO ELECTRIC)</span>
+                    </div>
+
+                    <div class="border-l-2 border-f1-red pl-3 sm:pl-4">
+                        <span class="text-[10px] sm:text-xs font-mono text-gray-400 uppercase">Technical Specs</span>
+                        <p class="text-xs sm:text-sm text-gray-400 mt-1">14 turns, anti-clockwise orientation, high-grip polymer concrete surface.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="karts" class="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
+        <div class="text-center mb-8 sm:mb-12">
+            <span class="text-f1-red font-mono text-[10px] sm:text-xs uppercase tracking-widest">// THE MACHINERY</span>
+            <h2 class="font-racing italic text-3xl sm:text-5xl font-extrabold mt-1 sm:mt-2">FLEET SPECIFICATIONS</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+            
+            <div class="glass-panel glass-panel-hover kart-card rounded-2xl sm:rounded-3xl p-5 sm:p-6 flex flex-col justify-between group">
+                <div>
+                    <div class="text-[10px] sm:text-xs font-mono text-f1-blue mb-1 sm:mb-2">// ROOKIE CLASS</div>
+                    <h3 class="font-racing italic text-xl sm:text-2xl font-bold mb-1">APEX CADET</h3>
+                    <p class="text-xs text-gray-400 mb-4 sm:mb-6">Designed for junior drivers & first-timers prioritizing control.</p>
+                    
+                    <div class="space-y-2.5 sm:space-y-3 mb-6 sm:mb-8">
+                        <div class="flex justify-between text-xs border-b border-white/5 pb-2">
+                            <span class="text-gray-400">Top Speed</span>
+                            <span class="font-bold">55 KM/H</span>
+                        </div>
+                        <div class="flex justify-between text-xs border-b border-white/5 pb-2">
+                            <span class="text-gray-400">Powertrain</span>
+                            <span class="font-bold">10kW Electric</span>
+                        </div>
+                        <div class="flex justify-between text-xs border-b border-white/5 pb-2">
+                            <span class="text-gray-400">Min. Height</span>
+                            <span class="font-bold">120 cm</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full h-36 sm:h-44 bg-black/40 rounded-xl overflow-hidden border border-white/5 relative">
+                    <img src="https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=600&q=80" 
+                         alt="Apex Cadet Go Kart" 
+                         class="kart-img w-full h-full object-cover opacity-85 group-hover:opacity-100" loading="lazy">
+                </div>
+            </div>
+
+            <div class="glass-panel-active kart-card rounded-2xl sm:rounded-3xl p-5 sm:p-6 flex flex-col justify-between relative group">
+                <div class="absolute -top-3 right-4 sm:right-6 bg-f1-red text-white text-[9px] sm:text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider z-10">
+                    Most Popular
+                </div>
+                <div>
+                    <div class="text-[10px] sm:text-xs font-mono text-f1-red mb-1 sm:mb-2">// ADULT PRO</div>
+                    <h3 class="font-racing italic text-xl sm:text-2xl font-bold mb-1">VELOCITY RTX</h3>
+                    <p class="text-xs text-gray-400 mb-4 sm:mb-6">High-output electric kart with Formula-style steering display.</p>
+                    
+                    <div class="space-y-2.5 sm:space-y-3 mb-6 sm:mb-8">
+                        <div class="flex justify-between text-xs border-b border-white/5 pb-2">
+                            <span class="text-gray-400">Top Speed</span>
+                            <span class="font-bold text-f1-red">105 KM/H</span>
+                        </div>
+                        <div class="flex justify-between text-xs border-b border-white/5 pb-2">
+                            <span class="text-gray-400">Powertrain</span>
+                            <span class="font-bold">25kW Dual Electric</span>
+                        </div>
+                        <div class="flex justify-between text-xs border-b border-white/5 pb-2">
+                            <span class="text-gray-400">Feature</span>
+                            <span class="font-bold">Push-to-Pass Boost</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full h-36 sm:h-44 bg-black/40 rounded-xl overflow-hidden border border-f1-red/30 relative">
+                    <img src="https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=600&q=80" 
+                         alt="Velocity RTX Racing Kart" 
+                         class="kart-img w-full h-full object-cover opacity-85 group-hover:opacity-100" loading="lazy">
+                </div>
+            </div>
+
+            <div class="glass-panel glass-panel-hover kart-card rounded-2xl sm:rounded-3xl p-5 sm:p-6 flex flex-col justify-between group">
+                <div>
+                    <div class="text-[10px] sm:text-xs font-mono text-f1-blue mb-1 sm:mb-2">// TANDEM EXPERIENCE</div>
+                    <h3 class="font-racing italic text-xl sm:text-2xl font-bold mb-1">DUO TURBO</h3>
+                    <p class="text-xs text-gray-400 mb-4 sm:mb-6">Two-seater design for instruction, kids with adults, or pairs.</p>
+                    
+                    <div class="space-y-2.5 sm:space-y-3 mb-6 sm:mb-8">
+                        <div class="flex justify-between text-xs border-b border-white/5 pb-2">
+                            <span class="text-gray-400">Top Speed</span>
+                            <span class="font-bold">75 KM/H</span>
+                        </div>
+                        <div class="flex justify-between text-xs border-b border-white/5 pb-2">
+                            <span class="text-gray-400">Powertrain</span>
+                            <span class="font-bold">270cc Gas / Dual Control</span>
+                        </div>
+                        <div class="flex justify-between text-xs border-b border-white/5 pb-2">
+                            <span class="text-gray-400">Capacity</span>
+                            <span class="font-bold">2 Drivers</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full h-36 sm:h-44 bg-black/40 rounded-xl overflow-hidden border border-white/5 relative">
+                    <img src="https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=600&q=80" 
+                         alt="Duo Turbo Kart" 
+                         class="kart-img w-full h-full object-cover opacity-85 group-hover:opacity-100" loading="lazy">
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="pricing" class="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
+        <div class="text-center mb-8 sm:mb-12">
+            <span class="text-f1-blue font-mono text-[10px] sm:text-xs uppercase tracking-widest">// RACE PACKAGES</span>
+            <h2 class="font-racing italic text-3xl sm:text-5xl font-extrabold mt-1 sm:mt-2">SELECT YOUR HEAT</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-stretch">
+            
+            <div class="glass-panel glass-panel-hover rounded-2xl sm:rounded-3xl p-6 sm:p-8 flex flex-col justify-between group">
+                <div>
+                    <div class="text-[10px] sm:text-xs font-mono text-gray-400 uppercase tracking-widest mb-3 sm:mb-4">Sprint Pass</div>
+                    <h3 class="font-racing italic text-2xl sm:text-3xl font-extrabold mb-1 sm:mb-2">10 LAPS</h3>
+                    <div class="text-3xl sm:text-4xl font-extrabold font-racing text-white mb-6">₹1,499 <span class="text-xs font-sans text-gray-400 font-normal">/ driver</span></div>
+                    
+                    <ul class="space-y-3 sm:space-y-4 text-xs text-gray-300 mb-8">
+                        <li class="flex items-center gap-2"><span class="text-f1-blue">✓</span> Full Safety Briefing & Headwear</li>
+                        <li class="flex items-center gap-2"><span class="text-f1-blue">✓</span> Live Telemetry Printout</li>
+                        <li class="flex items-center gap-2"><span class="text-f1-blue">✓</span> Standard Kart Access</li>
+                        <li class="flex items-center gap-2 text-gray-500"><span>✕</span> Push-to-Pass Boost System</li>
+                    </ul>
+                </div>
+                <button class="glass-button-blue w-full py-3 rounded-xl font-racing italic font-bold text-xs uppercase tracking-widest">
+                    Book 10 Laps
+                </button>
+            </div>
+
+            <div class="glass-panel-active rounded-2xl sm:rounded-3xl p-6 sm:p-8 flex flex-col justify-between relative transform md:-translate-y-3">
+                <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-f1-red text-white text-[9px] sm:text-[10px] font-bold px-4 py-1 rounded-full uppercase tracking-wider">
+                    Best Value
+                </div>
+                <div>
+                    <div class="text-[10px] sm:text-xs font-mono text-f1-red uppercase tracking-widest mb-3 sm:mb-4">Pro Heat</div>
+                    <h3 class="font-racing italic text-2xl sm:text-3xl font-extrabold mb-1 sm:mb-2">15 LAPS</h3>
+                    <div class="text-3xl sm:text-4xl font-extrabold font-racing text-white mb-6">₹2,299 <span class="text-xs font-sans text-gray-400 font-normal">/ driver</span></div>
+                    
+                    <ul class="space-y-3 sm:space-y-4 text-xs text-gray-300 mb-8">
+                        <li class="flex items-center gap-2"><span class="text-f1-red">✓</span> Full Safety Briefing & Headwear</li>
+                        <li class="flex items-center gap-2"><span class="text-f1-red">✓</span> Live Mobile App Telemetry</li>
+                        <li class="flex items-center gap-2"><span class="text-f1-red">✓</span> High-Output Velocity RTX Kart</li>
+                        <li class="flex items-center gap-2"><span class="text-f1-red">✓</span> 2x Push-to-Pass Boost Charges</li>
+                    </ul>
+                </div>
+                <button class="glass-button-red w-full py-3.5 sm:py-4 rounded-xl font-racing italic font-bold text-xs uppercase tracking-widest">
+                    Book 15 Laps
+                </button>
+            </div>
+
+            <div class="glass-panel glass-panel-hover rounded-2xl sm:rounded-3xl p-6 sm:p-8 flex flex-col justify-between group">
+                <div>
+                    <div class="text-[10px] sm:text-xs font-mono text-gray-400 uppercase tracking-widest mb-3 sm:mb-4">Endurance Sprint</div>
+                    <h3 class="font-racing italic text-2xl sm:text-3xl font-extrabold mb-1 sm:mb-2">20 LAPS</h3>
+                    <div class="text-3xl sm:text-4xl font-extrabold font-racing text-white mb-6">₹2,999 <span class="text-xs font-sans text-gray-400 font-normal">/ driver</span></div>
+                    
+                    <ul class="space-y-3 sm:space-y-4 text-xs text-gray-300 mb-8">
+                        <li class="flex items-center gap-2"><span class="text-f1-blue">✓</span> Full Safety Briefing & Premium Helmet</li>
+                        <li class="flex items-center gap-2"><span class="text-f1-blue">✓</span> Complete Telemetry Analysis & Video</li>
+                        <li class="flex items-center gap-2"><span class="text-f1-blue">✓</span> High-Output Velocity RTX Kart</li>
+                        <li class="flex items-center gap-2"><span class="text-f1-blue">✓</span> Unlimited Boost & VIP Podium Access</li>
+                    </ul>
+                </div>
+                <button class="glass-button-blue w-full py-3 rounded-xl font-racing italic font-bold text-xs uppercase tracking-widest">
+                    Book 20 Laps
+                </button>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="testimonials" class="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
+        <div class="text-center mb-8 sm:mb-12">
+            <span class="text-f1-red font-mono text-[10px] sm:text-xs uppercase tracking-widest">// RACER FEEDBACK</span>
+            <h2 class="font-racing italic text-3xl sm:text-5xl font-extrabold mt-1 sm:mt-2">DRIVER TESTIMONIALS</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <div class="glass-panel glass-panel-hover p-6 sm:p-8 rounded-2xl sm:rounded-3xl flex flex-col justify-between">
+                <p class="text-gray-300 text-xs sm:text-sm italic leading-relaxed mb-6">
+                    "Closest thing to actual Formula racing you can do without a license. The instant torque on the electric karts coming out of Turn 4 is unbelievable."
+                </p>
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-f1-red/20 border border-f1-red flex items-center justify-center font-bold text-xs">
+                        DR
+                    </div>
+                    <div>
+                        <div class="font-bold text-xs sm:text-sm">Daniel R.</div>
+                        <div class="text-[10px] sm:text-xs text-f1-blue font-mono">15 Lap Session — 49.1s Record</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel glass-panel-hover p-6 sm:p-8 rounded-2xl sm:rounded-3xl flex flex-col justify-between">
+                <p class="text-gray-300 text-xs sm:text-sm italic leading-relaxed mb-6">
+                    "Brought our corporate team here for a private event. The live telemetry leaderboard on the giant screens made everyone super competitive!"
+                </p>
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-f1-blue/20 border border-f1-blue flex items-center justify-center font-bold text-xs">
+                        SK
+                    </div>
+                    <div>
+                        <div class="font-bold text-xs sm:text-sm">Sarah K.</div>
+                        <div class="text-[10px] sm:text-xs text-f1-blue font-mono">Corporate Event Organizer</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel glass-panel-hover p-6 sm:p-8 rounded-2xl sm:rounded-3xl flex flex-col justify-between">
+                <p class="text-gray-300 text-xs sm:text-sm italic leading-relaxed mb-6">
+                    "The website made booking and signing digital waivers seamless before we even got to the track. Top-tier facility and incredibly professional."
+                </p>
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-f1-red/20 border border-f1-red flex items-center justify-center font-bold text-xs">
+                        MC
+                    </div>
+                    <div>
+                        <div class="font-bold text-xs sm:text-sm">Marcus C.</div>
+                        <div class="text-[10px] sm:text-xs text-f1-blue font-mono">20 Lap Endurance Racer</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="border-t border-white/10 max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col md:flex-row justify-between items-center text-[10px] sm:text-xs text-gray-500 gap-4">
+        <div>&copy; 2026 SPEED Karting Venue. Designed for High Performance.</div>
+        <div class="flex gap-6 font-mono">
+            <a href="#" class="hover:text-white transition-colors">PRIVACY</a>
+            <a href="#" class="hover:text-white transition-colors">WAIVER</a>
+            <a href="#" class="hover:text-white transition-colors">TELEMETRY API</a>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <script>
+        // Mobile Navigation Drawer Toggle
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            mobileMenu.classList.toggle('flex');
+            document.body.classList.toggle('overflow-hidden');
+        });
+
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+                mobileMenu.classList.remove('flex');
+                document.body.classList.remove('overflow-hidden');
+            });
+        });
+
+        // Entrance GSAP Animation (Cross-Platform Ready)
+        window.addEventListener('DOMContentLoaded', () => {
+            gsap.to(".hero-anim", {
+                y: 0,
+                opacity: 1,
+                duration: 1,
+                stagger: 0.12,
+                ease: "power3.out"
+            });
+        });
+    </script>
+</body>
+</html>
